@@ -1,0 +1,4 @@
+enum MaterialType {
+  SAND,
+  WATER,
+};
