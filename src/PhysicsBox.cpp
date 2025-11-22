@@ -3,6 +3,8 @@
 #include "PhysicsBox/MaterialTypeEnum.h"
 #include <SDL3/SDL.h>
 #include <iostream>
+#include <string.h>
+#include <string>
 
 struct PhysicsBoxApp {
 
@@ -41,12 +43,21 @@ struct PhysicsBoxApp {
   }
 
   void MainLoop() {
+    Uint64 lastTime;
+    Uint64 fps;
+
     while (m_Running) {
-
+      Uint64 currentTick = SDL_GetTicks();
       Tick();
-
-      // 60 fps
       SDL_Delay(16);
+      fps++;
+      Uint64 deltaTime = SDL_GetTicks() - currentTick;
+      if (currentTick > lastTime + 1000) {
+        lastTime = currentTick;
+        std::string title = "PhysicsBox " + std::to_string(fps);
+        SDL_SetWindowTitle(m_Window, title.c_str());
+        fps = 0;
+      }
     }
 
     SDL_DestroyRenderer(m_Renderer);
