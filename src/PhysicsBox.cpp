@@ -1,12 +1,11 @@
 // Copyright 2025 Piotr "Peanut" Bielański
 
-#include "PhysicsBox/MaterialTypeEnum.h"
-#include "PhysicsBox/PhysicsBoxApp.h"
 #include <SDL3/SDL.h>
 
-int main() {
+#include "PhysicsBox/PhysicsBoxApp.h"
 
-  PhysicsBoxApp app;
+int main() {
+  PhysicsBoxApp app(720, 720, 12);
   app.MainLoop();
 
   return 0;
