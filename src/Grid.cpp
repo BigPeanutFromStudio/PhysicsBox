@@ -13,4 +13,18 @@ MaterialType Grid::getCell(int x, int y) const { return m_grid[y][x]; }
 void Grid::setCell(int x, int y, MaterialType material) {
   m_grid[y][x] = material;
 }
-void Grid::update(Uint64 dt) {}
+void Grid::update() {
+  for (int i = getHeight() - 1; i >= 0; --i) {
+    for (int j = 0; j < getWidth(); j++) {
+      if (getCell(j, i) != MaterialType::AIR) {
+        if (i + 1 >= getHeight()) {
+          continue;
+        }
+        if (getCell(j, i + 1) == MaterialType::AIR) {
+          setCell(j, i + 1, getCell(j, i));
+          setCell(j, i, MaterialType::AIR);
+        }
+      }
+    }
+  }
+}

@@ -14,14 +14,16 @@ class PhysicsBoxApp {
   SDL_Texture* m_Texture;
   bool m_Running = true;
   Grid m_grid;
+  int m_gridUpdateRate;
+  int m_updateGridTimer;
 
-  void Tick();
-  void Update();
+  void Tick(Uint64 dt);
+  void Update(Uint64 dt);
   void Render();
   void HandleEvents();
 
  public:
   void MainLoop();
-  PhysicsBoxApp(int width, int height, int pixelScale);
+  PhysicsBoxApp(int width, int height, int pixelScale, int updateRateMs);
   ~PhysicsBoxApp();
 };

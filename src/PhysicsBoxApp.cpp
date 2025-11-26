@@ -1,17 +1,19 @@
 #include <PhysicsBox/PhysicsBoxApp.h>
-#include <SDL3/SDL.h>
+#include <SDL3/SDL_stdinc.h>
 
 #include <cstdint>
 #include <iostream>
 #include <string>
 #include <vector>
 
-PhysicsBoxApp::PhysicsBoxApp(int w, int h, int pixelScale)
+PhysicsBoxApp::PhysicsBoxApp(int w, int h, int pixelScale, int updateRateMs)
     : m_windowHeight(h),
       m_windowWidth(w),
       m_pixelScale(pixelScale),
       m_grid(static_cast<int>(m_windowWidth / pixelScale),
-             static_cast<int>(m_windowHeight / pixelScale)) {
+             static_cast<int>(m_windowHeight / pixelScale)),
+      m_updateGridTimer(0),
+      m_gridUpdateRate(updateRateMs) {
   if (!SDL_Init(SDL_INIT_VIDEO)) {
     std::cerr << "SDL_Init Error: " << SDL_GetError() << "\n";
     return;
@@ -30,15 +32,21 @@ PhysicsBoxApp::PhysicsBoxApp(int w, int h, int pixelScale)
     SDL_DestroyWindow(m_Window);
     SDL_Quit();
   }
-
   m_Texture = SDL_CreateTexture(m_Renderer, SDL_PIXELFORMAT_ARGB8888,
                                 SDL_TEXTUREACCESS_STREAMING, m_grid.getWidth(),
                                 m_grid.getHeight());
+  SDL_SetTextureScaleMode(m_Texture, SDL_SCALEMODE_NEAREST);
 }
 
 PhysicsBoxApp::~PhysicsBoxApp() { SDL_Quit(); }
 
-void PhysicsBoxApp::Update() {}
+void PhysicsBoxApp::Update(Uint64 dt) {
+  m_updateGridTimer++;
+  if (m_updateGridTimer >= m_gridUpdateRate) {
+    m_grid.update();
+    m_updateGridTimer = 0;
+  }
+}
 
 void PhysicsBoxApp::Render() {
   std::vector<uint32_t> pixels(m_grid.getWidth() * m_grid.getHeight(),
@@ -95,22 +103,26 @@ void PhysicsBoxApp::HandleEvents() {
   }
 }
 
-void PhysicsBoxApp::Tick() {
+void PhysicsBoxApp::Tick(Uint64 dt) {
   HandleEvents();
-  Update();
+  Update(dt);
   Render();
 }
 
 void PhysicsBoxApp::MainLoop() {
-  Uint64 lastTime = 0;
+  Uint64 lastTick = SDL_GetTicks();
+  Uint64 lastTime = lastTick;
   Uint64 fps = 0;
 
   while (m_Running) {
     Uint64 currentTick = SDL_GetTicks();
-    Tick();
-    SDL_Delay(16);
-    fps++;
     Uint64 deltaTime = SDL_GetTicks() - currentTick;
+    lastTick = currentTick;
+
+    Tick(deltaTime);
+
+    fps++;
+
     if (currentTick > lastTime + 1000) {
       lastTime = currentTick;
       std::string title = "PhysicsBox " + std::to_string(fps);

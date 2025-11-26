@@ -15,7 +15,7 @@ class Grid {
  public:
   Grid(int width, int height);
 
-  void update(Uint64 dt);
+  void update();
   MaterialType getCell(int x, int y) const;
   void setCell(int x, int y, MaterialType material);
   int getWidth() const;
