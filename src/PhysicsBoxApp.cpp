@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <iostream>
 #include <string>
+#include <utility>
 #include <vector>
 
 PhysicsBoxApp::PhysicsBoxApp(int w, int h, int pixelScale, int updateRateMs)
@@ -13,7 +14,8 @@ PhysicsBoxApp::PhysicsBoxApp(int w, int h, int pixelScale, int updateRateMs)
       m_grid(static_cast<int>(m_windowWidth / pixelScale),
              static_cast<int>(m_windowHeight / pixelScale)),
       m_updateGridTimer(0),
-      m_gridUpdateRate(updateRateMs) {
+      m_gridUpdateRate(updateRateMs),
+      m_InputManager() {
   if (!SDL_Init(SDL_INIT_VIDEO)) {
     std::cerr << "SDL_Init Error: " << SDL_GetError() << "\n";
     return;
@@ -41,11 +43,28 @@ PhysicsBoxApp::PhysicsBoxApp(int w, int h, int pixelScale, int updateRateMs)
 PhysicsBoxApp::~PhysicsBoxApp() { SDL_Quit(); }
 
 void PhysicsBoxApp::Update(Uint64 dt) {
+  // TODO: drag and click based on movement so you can still place one
+
+  if (m_InputManager.wasMouseButtonPressed(1)) {
+    std::pair<int, int> mousePos = m_InputManager.getMousePosition();
+
+    int gridX = (mousePos.first / m_pixelScale);
+    int gridY = (mousePos.second / m_pixelScale);
+    m_grid.setCell(gridX, gridY, MaterialType::SAND);
+  } else if (m_InputManager.isMouseButtonDown(1)) {
+    std::pair<int, int> mousePos = m_InputManager.getMousePosition();
+
+    int gridX = (mousePos.first / m_pixelScale);
+    int gridY = (mousePos.second / m_pixelScale);
+    m_grid.setCell(gridX, gridY, MaterialType::SAND);
+  }
+
   m_updateGridTimer++;
   if (m_updateGridTimer >= m_gridUpdateRate) {
     m_grid.update();
     m_updateGridTimer = 0;
   }
+  m_InputManager.updateFrameState();
 }
 
 void PhysicsBoxApp::Render() {
@@ -85,21 +104,12 @@ void PhysicsBoxApp::HandleEvents() {
         if (ev.key.scancode == SDL_SCANCODE_ESCAPE) {
           m_Running = false;
         }
-        break;
-      }
-      case SDL_EVENT_MOUSE_BUTTON_DOWN: {
-        int mouseX = ev.motion.x;
-        int mouseY = ev.motion.y;
-
-        int gridX = (mouseX / m_pixelScale);
-        int gridY = (mouseY / m_pixelScale);
-
-        m_grid.setCell(gridX, gridY, MaterialType::SAND);
-        break;
       }
       default:
         break;
     }
+    m_InputManager.processKeyboardEvents(ev);
+    m_InputManager.processMouseEvents(ev);
   }
 }
 

@@ -3,6 +3,7 @@
 #include <SDL3/SDL_render.h>
 
 #include "PhysicsBox/Grid.h"
+#include "PhysicsBox/InputManager.h"
 
 class PhysicsBoxApp {
  private:
@@ -16,6 +17,7 @@ class PhysicsBoxApp {
   Grid m_grid;
   int m_gridUpdateRate;
   int m_updateGridTimer;
+  InputManager m_InputManager;
 
   void Tick(Uint64 dt);
   void Update(Uint64 dt);
