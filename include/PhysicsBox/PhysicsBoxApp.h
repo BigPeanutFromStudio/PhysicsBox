@@ -1,6 +1,7 @@
 #pragma once
 #include <SDL3/SDL.h>
-#include <SDL3/SDL_render.h>
+
+#include <vector>
 
 #include "PhysicsBox/Grid.h"
 #include "PhysicsBox/InputManager.h"
@@ -12,6 +13,7 @@ class PhysicsBoxApp {
   int m_windowWidth;
   int m_pixelScale;
   SDL_Renderer* m_Renderer;
+  std::vector<uint32_t> m_Pixels;
   SDL_Texture* m_Texture;
   bool m_Running = true;
   Grid m_grid;

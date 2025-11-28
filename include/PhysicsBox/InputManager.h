@@ -5,6 +5,12 @@
 #include <unordered_map>
 #include <utility>
 
+enum MouseButton {
+  LEFT = 1,
+  MIDDLE,
+  RIGHT,
+};
+
 class InputManager {
  private:
   std::unordered_map<SDL_Keycode, bool> m_PrevKeyboardStates;

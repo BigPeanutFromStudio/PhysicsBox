@@ -34,6 +34,8 @@ PhysicsBoxApp::PhysicsBoxApp(int w, int h, int pixelScale, int updateRateMs)
     SDL_DestroyWindow(m_Window);
     SDL_Quit();
   }
+  m_Pixels =
+      std::vector<uint32_t>(m_grid.getWidth() * m_grid.getHeight(), 0xff000000),
   m_Texture = SDL_CreateTexture(m_Renderer, SDL_PIXELFORMAT_ARGB8888,
                                 SDL_TEXTUREACCESS_STREAMING, m_grid.getWidth(),
                                 m_grid.getHeight());
@@ -43,7 +45,7 @@ PhysicsBoxApp::PhysicsBoxApp(int w, int h, int pixelScale, int updateRateMs)
 PhysicsBoxApp::~PhysicsBoxApp() { SDL_Quit(); }
 
 void PhysicsBoxApp::Update(Uint64 dt) {
-  if (m_InputManager.isMouseButtonDown(1)) {
+  if (m_InputManager.isMouseButtonDown(MouseButton::LEFT)) {
     std::pair<int, int> mousePos = m_InputManager.getMousePosition();
 
     int gridX = (mousePos.first / m_pixelScale);
@@ -60,14 +62,14 @@ void PhysicsBoxApp::Update(Uint64 dt) {
 }
 
 void PhysicsBoxApp::Render() {
-  std::vector<uint32_t> pixels(m_grid.getWidth() * m_grid.getHeight(),
-                               0xff000000);
+  std::fill(m_Pixels.begin(), m_Pixels.end(), 0xff000000);
+
   int pitch = m_grid.getWidth() * sizeof(uint32_t);
 
   for (int i = 0; i < m_grid.getHeight(); i++) {
     for (int j = 0; j < m_grid.getWidth(); j++) {
       if (m_grid.getCell(j, i) == MaterialType::SAND) {
-        pixels[i * m_grid.getWidth() + j] = 0xffff0000;
+        m_Pixels[i * m_grid.getWidth() + j] = 0xffff0000;
       }
     }
   }
@@ -75,7 +77,7 @@ void PhysicsBoxApp::Render() {
   SDL_Rect dest = {0, 0, m_grid.getWidth() * m_pixelScale,
                    m_grid.getHeight() * m_pixelScale};
 
-  SDL_UpdateTexture(m_Texture, &dest, pixels.data(),
+  SDL_UpdateTexture(m_Texture, &dest, m_Pixels.data(),
                     m_grid.getWidth() * sizeof(uint32_t));
 
   SDL_RenderClear(m_Renderer);
