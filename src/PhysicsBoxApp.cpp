@@ -43,15 +43,7 @@ PhysicsBoxApp::PhysicsBoxApp(int w, int h, int pixelScale, int updateRateMs)
 PhysicsBoxApp::~PhysicsBoxApp() { SDL_Quit(); }
 
 void PhysicsBoxApp::Update(Uint64 dt) {
-  // TODO: drag and click based on movement so you can still place one
-
-  if (m_InputManager.wasMouseButtonPressed(1)) {
-    std::pair<int, int> mousePos = m_InputManager.getMousePosition();
-
-    int gridX = (mousePos.first / m_pixelScale);
-    int gridY = (mousePos.second / m_pixelScale);
-    m_grid.setCell(gridX, gridY, MaterialType::SAND);
-  } else if (m_InputManager.isMouseButtonDown(1)) {
+  if (m_InputManager.isMouseButtonDown(1)) {
     std::pair<int, int> mousePos = m_InputManager.getMousePosition();
 
     int gridX = (mousePos.first / m_pixelScale);
