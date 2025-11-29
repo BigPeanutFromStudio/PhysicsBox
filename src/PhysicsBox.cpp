@@ -5,7 +5,7 @@
 #include "PhysicsBox/PhysicsBoxApp.h"
 
 int main() {
-  PhysicsBoxApp app(1280, 720, 16, 100);
+  PhysicsBoxApp app(1280, 720, 8, 50);
   app.mainLoop();
 
   return 0;

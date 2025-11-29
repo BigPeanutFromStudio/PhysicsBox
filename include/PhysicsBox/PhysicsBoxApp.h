@@ -25,6 +25,8 @@ class PhysicsBoxApp {
   void update(Uint64 dt);
   void render();
   void handleEvents();
+  uint32_t colorForMaterial(MaterialType material);
+  void placeMaterial(std::pair<int, int> mousePos, MaterialType material);
 
  public:
   void mainLoop();

@@ -1,11 +1,13 @@
 #include <PhysicsBox/PhysicsBoxApp.h>
-#include <SDL3/SDL_stdinc.h>
 
 #include <cstdint>
 #include <iostream>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include "PhysicsBox/Colors.h"
+#include "PhysicsBox/InputManager.h"
 
 PhysicsBoxApp::PhysicsBoxApp(int w, int h, int pixelScale, int updateRateMs)
     : m_windowHeight(h),
@@ -47,10 +49,14 @@ PhysicsBoxApp::~PhysicsBoxApp() { SDL_Quit(); }
 void PhysicsBoxApp::update(Uint64 dt) {
   if (m_inputManager.isMouseButtonDown(MouseButton::LEFT)) {
     std::pair<int, int> mousePos = m_inputManager.getMousePosition();
+    placeMaterial(mousePos, MaterialType::SAND);
 
-    int gridX = (mousePos.first / m_pixelScale);
-    int gridY = (mousePos.second / m_pixelScale);
-    m_grid.setCell(gridX, gridY, MaterialType::SAND);
+  } else if (m_inputManager.isMouseButtonDown(MouseButton::RIGHT)) {
+    std::pair<int, int> mousePos = m_inputManager.getMousePosition();
+    placeMaterial(mousePos, MaterialType::WATER);
+  } else if (m_inputManager.isMouseButtonDown(MouseButton::MIDDLE)) {
+    std::pair<int, int> mousePos = m_inputManager.getMousePosition();
+    placeMaterial(mousePos, MaterialType::STONE);
   }
 
   m_updateGridTimer++;
@@ -68,9 +74,8 @@ void PhysicsBoxApp::render() {
 
   for (int i = 0; i < m_grid.getHeight(); i++) {
     for (int j = 0; j < m_grid.getWidth(); j++) {
-      if (m_grid.getCell(j, i) == MaterialType::SAND) {
-        m_pixels[i * m_grid.getWidth() + j] = 0xffff0000;
-      }
+      m_pixels[i * m_grid.getWidth() + j] =
+          colorForMaterial(m_grid.getCell(j, i));
     }
   }
 
@@ -138,4 +143,31 @@ void PhysicsBoxApp::mainLoop() {
   SDL_DestroyRenderer(m_renderer);
   SDL_DestroyWindow(m_window);
   SDL_Quit();
+}
+
+uint32_t PhysicsBoxApp::colorForMaterial(MaterialType material) {
+  switch (material) {
+    case MaterialType::AIR:
+      return AIR_COLOR;
+      break;
+    case MaterialType::SAND:
+      return SAND_COLOR;
+      break;
+    case MaterialType::WATER:
+      return WATER_COLOR;
+      break;
+    case MaterialType::STONE:
+      return STONE_COLOR;
+      break;
+    default:
+      return 0xff000000;
+      break;
+  }
+}
+
+void PhysicsBoxApp::placeMaterial(std::pair<int, int> mousePos,
+                                  MaterialType material) {
+  int gridX = (mousePos.first / m_pixelScale);
+  int gridY = (mousePos.second / m_pixelScale);
+  m_grid.setCell(gridX, gridY, material);
 }

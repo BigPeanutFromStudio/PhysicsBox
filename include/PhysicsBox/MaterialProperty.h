@@ -1,0 +1,3 @@
+struct MaterialProperty {
+  int density;
+};
