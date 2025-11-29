@@ -6,7 +6,7 @@
 
 int main() {
   PhysicsBoxApp app(1280, 720, 16, 100);
-  app.MainLoop();
+  app.mainLoop();
 
   return 0;
 }

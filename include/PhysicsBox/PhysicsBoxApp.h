@@ -8,26 +8,26 @@
 
 class PhysicsBoxApp {
  private:
-  SDL_Window* m_Window;
+  SDL_Window* m_window;
   int m_windowHeight;
   int m_windowWidth;
   int m_pixelScale;
-  SDL_Renderer* m_Renderer;
-  std::vector<uint32_t> m_Pixels;
-  SDL_Texture* m_Texture;
-  bool m_Running = true;
+  SDL_Renderer* m_renderer;
+  std::vector<uint32_t> m_pixels;
+  SDL_Texture* m_texture;
+  bool m_running = true;
   Grid m_grid;
   int m_gridUpdateRate;
   int m_updateGridTimer;
-  InputManager m_InputManager;
+  InputManager m_inputManager;
 
-  void Tick(Uint64 dt);
-  void Update(Uint64 dt);
-  void Render();
-  void HandleEvents();
+  void tick(Uint64 dt);
+  void update(Uint64 dt);
+  void render();
+  void handleEvents();
 
  public:
-  void MainLoop();
+  void mainLoop();
   PhysicsBoxApp(int width, int height, int pixelScale, int updateRateMs);
   ~PhysicsBoxApp();
 };

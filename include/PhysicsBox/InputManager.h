@@ -13,11 +13,11 @@ enum MouseButton {
 
 class InputManager {
  private:
-  std::unordered_map<SDL_Keycode, bool> m_PrevKeyboardStates;
-  std::unordered_map<SDL_Keycode, bool> m_KeyboardStates;
-  std::unordered_map<int, bool> m_PrevMouseStates;
-  std::unordered_map<int, bool> m_MouseStates;
-  std::pair<int, int> m_MousePos;
+  std::unordered_map<SDL_Keycode, bool> m_prevKeyboardStates;
+  std::unordered_map<SDL_Keycode, bool> m_keyboardStates;
+  std::unordered_map<int, bool> m_prevMouseStates;
+  std::unordered_map<int, bool> m_mouseStates;
+  std::pair<int, int> m_mousePos;
 
  public:
   InputManager();
