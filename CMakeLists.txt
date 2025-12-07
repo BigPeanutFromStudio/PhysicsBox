@@ -39,7 +39,7 @@ set(IMGUI_SOURCES
     ${IMGUI_DIR}/misc/cpp/imgui_stdlib.cpp
 )
 
-add_executable(PhysicsBox ${SOURCES} ${IMGUI_DIR})
+add_executable(PhysicsBox ${SOURCES} ${IMGUI_SOURCES})
 
 # Include the header directory
 target_include_directories(PhysicsBox PRIVATE ${PROJECT_SOURCE_DIR}/include ${IMGUI_DIR} ${IMGUI_DIR}/backends)

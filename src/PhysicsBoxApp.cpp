@@ -1,5 +1,9 @@
 #include <PhysicsBox/PhysicsBoxApp.h>
 
+#include <imgui.h>
+#include <imgui_impl_sdl3.h>
+#include <imgui_impl_sdlrenderer3.h>
+
 #include <cstdint>
 #include <iostream>
 #include <string>
@@ -39,6 +43,15 @@ PhysicsBoxApp::PhysicsBoxApp(int w, int h, int pixelScale, int updateRateMs)
     m_texture = SDL_CreateTexture(m_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, m_grid.getWidth(),
                                   m_grid.getHeight());
     SDL_SetTextureScaleMode(m_texture, SDL_SCALEMODE_NEAREST);
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    m_io = &ImGui::GetIO();
+    m_io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+    m_io->ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
+
+    ImGui_ImplSDL3_InitForSDLRenderer(m_window, m_renderer);
+    ImGui_ImplSDLRenderer3_Init(m_renderer);
 }
 
 PhysicsBoxApp::~PhysicsBoxApp() {
@@ -83,6 +96,12 @@ void PhysicsBoxApp::render() {
 
     SDL_RenderClear(m_renderer);
     SDL_RenderTexture(m_renderer, m_texture, nullptr, nullptr);
+    // SDL_RenderPresent(m_renderer);
+
+    ImGui::Render();
+
+    ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), m_renderer);
+
     SDL_RenderPresent(m_renderer);
 }
 
@@ -103,13 +122,22 @@ void PhysicsBoxApp::handleEvents() {
         default:
             break;
         }
-        m_inputManager.processKeyboardEvents(ev);
-        m_inputManager.processMouseEvents(ev);
+        ImGui_ImplSDL3_ProcessEvent(&ev);
+        if (!m_io->WantCaptureKeyboard) {
+            m_inputManager.processKeyboardEvents(ev);
+        }
+        if (!m_io->WantCaptureMouse) {
+            m_inputManager.processMouseEvents(ev);
+        }
     }
 }
 
 void PhysicsBoxApp::tick(Uint64 dt) {
     handleEvents();
+    ImGui_ImplSDLRenderer3_NewFrame();
+    ImGui_ImplSDL3_NewFrame();
+    ImGui::NewFrame();
+    ImGui::ShowDemoWindow(); // Show demo window! :)
     update(dt);
     render();
 }
