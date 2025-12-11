@@ -22,6 +22,8 @@ class PhysicsBoxApp {
     int m_updateGridTimer;
     InputManager m_inputManager;
     ImGuiIO *m_io;
+    int m_brushSize;
+    MaterialType m_brushMaterial;
 
     void tick(Uint64 dt);
     void update(Uint64 dt);

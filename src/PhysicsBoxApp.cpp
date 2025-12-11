@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "PhysicsBox/Colors.h"
+#include "PhysicsBox/Grid.h"
 #include "PhysicsBox/InputManager.h"
 
 PhysicsBoxApp::PhysicsBoxApp(int w, int h, int pixelScale, int updateRateMs)
@@ -20,7 +21,9 @@ PhysicsBoxApp::PhysicsBoxApp(int w, int h, int pixelScale, int updateRateMs)
     , m_grid(static_cast<int>(m_windowWidth / pixelScale), static_cast<int>(m_windowHeight / pixelScale))
     , m_updateGridTimer(0)
     , m_gridUpdateRate(updateRateMs)
-    , m_inputManager() {
+    , m_inputManager()
+    , m_brushSize(1)
+    , m_brushMaterial(MaterialType::SAND) {
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         std::cerr << "SDL_Init Error: " << SDL_GetError() << "\n";
         return;
@@ -61,14 +64,7 @@ PhysicsBoxApp::~PhysicsBoxApp() {
 void PhysicsBoxApp::update(Uint64 dt) {
     if (m_inputManager.isMouseButtonDown(MouseButton::LEFT)) {
         std::pair<int, int> mousePos = m_inputManager.getMousePosition();
-        placeMaterial(mousePos, MaterialType::SAND);
-
-    } else if (m_inputManager.isMouseButtonDown(MouseButton::RIGHT)) {
-        std::pair<int, int> mousePos = m_inputManager.getMousePosition();
-        placeMaterial(mousePos, MaterialType::WATER);
-    } else if (m_inputManager.isMouseButtonDown(MouseButton::MIDDLE)) {
-        std::pair<int, int> mousePos = m_inputManager.getMousePosition();
-        placeMaterial(mousePos, MaterialType::STONE);
+        placeMaterial(mousePos, m_brushMaterial);
     }
 
     m_updateGridTimer++;
@@ -137,7 +133,44 @@ void PhysicsBoxApp::tick(Uint64 dt) {
     ImGui_ImplSDLRenderer3_NewFrame();
     ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
-    ImGui::ShowDemoWindow(); // Show demo window! :)
+
+    // Normally you should use here scaled values
+    // Which I should get around to
+    // Using GetSystemMetrics()
+    // For now since I don't allow for resizing I'll use m_windowWidth and m_windowHeight
+    ImGui::SetNextWindowSize(ImVec2(m_windowWidth / 4, m_windowHeight / 5));
+    // This makes a window unmovable, if needed it should only happen once
+    // ImGui::SetNextWindowPos(ImVec2(30, 30));
+    //
+    // This determines if the window shall be opened or not
+    bool opened = true;
+    // Begin a window
+    if (ImGui::Begin("Brush Select", &opened, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoNav)) {
+
+        // Slider
+        ImGui::SliderInt("Brush size", &m_brushSize, 1, 10);
+
+        const char *items[] = {"Air", "Sand", "Water", "Stone"};
+
+        const char *combo_preview_value = items[int(m_brushMaterial)];
+        if (ImGui::BeginCombo("Brush material", combo_preview_value)) {
+            for (int n = 0; n < 4; n++) {
+                const bool is_selected = ((MaterialType)n == m_brushMaterial);
+
+                if (ImGui::Selectable(items[n], is_selected)) {
+                    m_brushMaterial = (MaterialType)n;
+                }
+
+                if (is_selected) {
+                    ImGui::SetItemDefaultFocus();
+                }
+            }
+            ImGui::EndCombo();
+        }
+    }
+    // End a window
+    ImGui::End();
+
     update(dt);
     render();
 }
@@ -192,5 +225,9 @@ uint32_t PhysicsBoxApp::colorForMaterial(MaterialType material) {
 void PhysicsBoxApp::placeMaterial(std::pair<int, int> mousePos, MaterialType material) {
     int gridX = (mousePos.first / m_pixelScale);
     int gridY = (mousePos.second / m_pixelScale);
-    m_grid.setCell(gridX, gridY, material);
+    for (int i = -(m_brushSize / 2); i <= (m_brushSize / 2); i++) {
+        for (int j = -(m_brushSize / 2); j <= (m_brushSize / 2); j++) {
+            m_grid.setCell(gridX + j, gridY + i, material);
+        }
+    }
 }
