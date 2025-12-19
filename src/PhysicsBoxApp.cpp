@@ -13,6 +13,7 @@
 #include "PhysicsBox/Colors.h"
 #include "PhysicsBox/Grid.h"
 #include "PhysicsBox/InputManager.h"
+#include "PhysicsBox/windows/BrushSelectWindow.h"
 
 PhysicsBoxApp::PhysicsBoxApp(int w, int h, int pixelScale, int updateRateMs)
     : m_windowHeight(h)
@@ -23,7 +24,8 @@ PhysicsBoxApp::PhysicsBoxApp(int w, int h, int pixelScale, int updateRateMs)
     , m_gridUpdateRate(updateRateMs)
     , m_inputManager()
     , m_brushSize(1)
-    , m_brushMaterial(MaterialType::SAND) {
+    , m_brushMaterial(MaterialType::SAND)
+    , m_brushSelectWindow(ImVec2(m_windowWidth / 4, m_windowHeight / 5), &m_brushSize, &m_brushMaterial) {
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         std::cerr << "SDL_Init Error: " << SDL_GetError() << "\n";
         return;
@@ -134,42 +136,7 @@ void PhysicsBoxApp::tick(Uint64 dt) {
     ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
 
-    // Normally you should use here scaled values
-    // Which I should get around to
-    // Using GetSystemMetrics()
-    // For now since I don't allow for resizing I'll use m_windowWidth and m_windowHeight
-    ImGui::SetNextWindowSize(ImVec2(m_windowWidth / 4, m_windowHeight / 5));
-    // This makes a window unmovable, if needed it should only happen once
-    // ImGui::SetNextWindowPos(ImVec2(30, 30));
-    //
-    // This determines if the window shall be opened or not
-    bool opened = true;
-    // Begin a window
-    if (ImGui::Begin("Brush Select", &opened, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoNav)) {
-
-        // Slider
-        ImGui::SliderInt("Brush size", &m_brushSize, 1, 10);
-
-        const char *items[] = {"Air", "Sand", "Water", "Stone"};
-
-        const char *combo_preview_value = items[int(m_brushMaterial)];
-        if (ImGui::BeginCombo("Brush material", combo_preview_value)) {
-            for (int n = 0; n < 4; n++) {
-                const bool is_selected = ((MaterialType)n == m_brushMaterial);
-
-                if (ImGui::Selectable(items[n], is_selected)) {
-                    m_brushMaterial = (MaterialType)n;
-                }
-
-                if (is_selected) {
-                    ImGui::SetItemDefaultFocus();
-                }
-            }
-            ImGui::EndCombo();
-        }
-    }
-    // End a window
-    ImGui::End();
+    m_brushSelectWindow.createWindow();
 
     update(dt);
     render();

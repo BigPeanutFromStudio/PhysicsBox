@@ -5,6 +5,7 @@
 
 #include "PhysicsBox/Grid.h"
 #include "PhysicsBox/InputManager.h"
+#include "PhysicsBox/windows/BrushSelectWindow.h"
 #include "imgui.h"
 
 class PhysicsBoxApp {
@@ -24,6 +25,7 @@ class PhysicsBoxApp {
     ImGuiIO *m_io;
     int m_brushSize;
     MaterialType m_brushMaterial;
+    BrushSelectWindow m_brushSelectWindow;
 
     void tick(Uint64 dt);
     void update(Uint64 dt);
