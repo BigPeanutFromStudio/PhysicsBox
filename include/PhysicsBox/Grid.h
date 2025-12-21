@@ -13,7 +13,7 @@ class Grid {
  private:
   int m_width;
   int m_height;
-  std::vector<std::vector<MaterialType>> m_grid;
+  std::vector<MaterialType> m_grid;
   std::mt19937 rng;
   std::unordered_map<MaterialType, MaterialProperty> m_materialProperties;
 

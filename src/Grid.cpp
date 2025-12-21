@@ -7,7 +7,7 @@
 Grid::Grid(int widht, int height)
     : m_height(height)
     , m_width(widht)
-    , m_grid(m_height, std::vector<MaterialType>(m_width, MaterialType::AIR))
+    , m_grid(m_height * m_width, MaterialType::AIR)
     , rng(std::random_device{}()) {
     m_materialProperties[MaterialType::SAND] = {2};
     m_materialProperties[MaterialType::WATER] = {1};
@@ -22,13 +22,13 @@ int Grid::getWidth() const {
     return m_width;
 }
 MaterialType Grid::getCell(int x, int y) const {
-    return m_grid[y][x];
+    return m_grid[x+y*getWidth()];
 }
 void Grid::setCell(int x, int y, MaterialType material) {
     if (x < 0 || x >= getWidth() || y < 0 || y >= getHeight()) {
         return;
     }
-    m_grid[y][x] = material;
+    m_grid[x+y*getWidth()] = material;
 }
 
 void Grid::update() {
